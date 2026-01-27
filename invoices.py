@@ -1,65 +1,77 @@
-# Strictly Imperative Invoice Management
-# No imports, no functions
+# ==========================================
+# INVOICE MANAGEMENT - EDUCATIONAL VERSION
+# ==========================================
+# This script manages income from client invoices.
+# Notice the repetitive pattern of opening and closing files.
+# In a functional version, you would create a function for file operations!
 
 FILENAME = "invoices.txt"
 
-# Create file if it doesn't exist
+# --- 1. INITIALIZATION ---
 try:
-    f = open(FILENAME, "r")
-    f.close()
+    file_test = open(FILENAME, "r")
+    file_test.close()
 except FileNotFoundError:
-    f = open(FILENAME, "w")
-    f.write("id,client_id,amount,date,description\n")
-    f.close()
+    init_db = open(FILENAME, "w")
+    init_db.write("id,client_id,amount,date,description\n")
+    init_db.close()
 
+# --- 2. MAIN LOOP ---
 while True:
-    print("\n--- INVOICE MANAGEMENT ---")
-    print("1. Add Invoice")
-    print("2. List Invoices")
-    print("3. Exit")
-    choice = input("Select an option: ")
+    print("\n" + "!"*25)
+    print("   INVOICE TRACKER")
+    print("!"*25)
+    print("1. Create New Invoice")
+    print("2. List All Invoices")
+    print("3. Exit Tracker")
     
+    choice = input("Selection: ")
+
+    # --- 3. ADD INVOICE SECTION ---
     if choice == '1':
-        client_id = input("Enter client ID: ")
-        amount = input("Enter amount: ")
-        date = input("Enter date (YYYY-MM-DD): ")
-        desc = input("Enter description: ")
+        print("\nEnter invoice details:")
+        client_id = input("- Client ID: ")
+        amount = input("- Amount (e.g. 150.50): ")
+        date = input("- Date (YYYY-MM-DD): ")
+        desc = input("- Description: ")
         
-        # Calculate next ID
-        f = open(FILENAME, "r")
-        lines = f.readlines()
-        f.close()
-        next_id = len(lines)
+        # Calculate ID
+        file_read = open(FILENAME, "r")
+        all_lines = file_read.readlines()
+        file_read.close()
+        new_id = len(all_lines)
         
-        # Append data
-        f = open(FILENAME, "a")
-        f.write(str(next_id) + "," + client_id + "," + amount + "," + date + "," + desc + "\n")
-        f.close()
-        print("Invoice added for client " + client_id + " (Amount: " + amount + ")")
+        # Save to file
+        file_append = open(FILENAME, "a")
+        # Format: id,client_id,amount,date,description
+        data_string = str(new_id) + "," + client_id + "," + amount + "," + date + "," + desc + "\n"
+        file_append.write(data_string)
+        file_append.close()
         
+        print(f"Invoice #{new_id} saved successfully.")
+
+    # --- 4. LIST INVOICES SECTION ---
     elif choice == '2':
-        print("\n--- INVOICE LIST ---")
-        f = open(FILENAME, "r")
-        header = f.readline() # Skip header
-        line = f.readline()
-        while line:
-            # Manual CSV parsing
-            parts = []
-            current_part = ""
-            for char in line:
-                if char == "," or char == "\n":
-                    parts.append(current_part)
-                    current_part = ""
-                else:
-                    current_part += char
+        print("\n--- INVOICE HISTORY ---")
+        
+        file_view = open(FILENAME, "r")
+        header = file_view.readline() # Burn the header
+        
+        current_data = file_view.readline()
+        while current_data:
+            # Use split to break the CSV line into a list
+            parts = current_data.strip().split(",")
             
             if len(parts) >= 5:
-                print("ID: " + parts[0] + " | Client: " + parts[1] + " | Amount: " + parts[2] + " | Date: " + parts[3] + " | Desc: " + parts[4])
-            line = f.readline()
-        f.close()
-        print("--------------------\n")
-        
+                print(f"INV #{parts[0]} | Client {parts[1]} | ${parts[2]} | {parts[3]} | {parts[4]}")
+            
+            current_data = file_view.readline()
+            
+        file_view.close()
+        print("-----------------------\n")
+
     elif choice == '3':
+        print("Exiting...")
         break
     else:
-        print("Invalid choice.")
+        print("Try again.")

@@ -1,63 +1,85 @@
-# Strictly Imperative Client Management
-# No imports, no functions
+# ==========================================
+# CLIENT MANAGEMENT - EDUCATIONAL VERSION
+# ==========================================
+# This script manages client data in a text file.
+# Students: Notice how the code is grouped into logical sections.
+# Each section could eventually become a function!
 
 FILENAME = "clients.txt"
 
-# Create file if it doesn't exist
+# --- 1. INITIALIZATION ---
+# Check if the file exists, if not, create it with a header.
 try:
-    f = open(FILENAME, "r")
-    f.close()
+    file_check = open(FILENAME, "r")
+    file_check.close()
 except FileNotFoundError:
-    f = open(FILENAME, "w")
-    f.write("id,name,email\n")
-    f.close()
+    print("Initializing database...")
+    database = open(FILENAME, "w")
+    database.write("id,name,email\n")
+    database.close()
 
+# --- 2. MAIN MENU LOOP ---
 while True:
-    print("\n--- CLIENT MANAGEMENT ---")
-    print("1. Add Client")
-    print("2. List Clients")
-    print("3. Exit")
-    choice = input("Select an option: ")
+    print("\n" + "="*25)
+    print("   CLIENT MANAGEMENT")
+    print("="*25)
+    print("1. Add a New Client")
+    print("2. View All Clients")
+    print("3. Exit Program")
+    print("-" * 25)
     
-    if choice == '1':
-        name = input("Enter client name: ")
-        email = input("Enter client email: ")
+    user_choice = input("What would you like to do? ")
+
+    # --- 3. ADD CLIENT SECTION ---
+    if user_choice == '1':
+        print("\nAdding a new client...")
+        name = input("- Name: ")
+        email = input("- Email: ")
         
-        # Calculate next ID
-        f = open(FILENAME, "r")
-        lines = f.readlines()
-        f.close()
-        next_id = len(lines)
+        # Step: Calculate the next ID (number of lines in file)
+        db_read = open(FILENAME, "r")
+        all_lines = db_read.readlines()
+        db_read.close()
+        new_id = len(all_lines)
         
-        # Append data
-        f = open(FILENAME, "a")
-        f.write(str(next_id) + "," + name + "," + email + "\n")
-        f.close()
-        print("Client " + name + " added with ID " + str(next_id))
+        # Step: Append the new client to the file
+        db_append = open(FILENAME, "a")
+        # Format: id,name,email
+        db_append.write(str(new_id) + "," + name + "," + email + "\n")
+        db_append.close()
         
-    elif choice == '2':
-        print("\n--- CLIENT LIST ---")
-        f = open(FILENAME, "r")
-        header = f.readline() # Skip header
-        line = f.readline()
-        while line:
-            # Manual CSV parsing (assuming no commas in names/emails for simplicity)
-            parts = []
-            current_part = ""
-            for char in line:
-                if char == "," or char == "\n":
-                    parts.append(current_part)
-                    current_part = ""
-                else:
-                    current_part += char
+        print(f"DONE! Client '{name}' saved with ID {new_id}.")
+
+    # --- 4. LIST CLIENTS SECTION ---
+    elif user_choice == '2':
+        print("\n" + "-"*30)
+        print("      CURRENT CLIENT LIST")
+        print("-"*30)
+        
+        db_view = open(FILENAME, "r")
+        header = db_view.readline() # Skip the first line (header)
+        
+        current_line = db_view.readline()
+        while current_line:
+            # Step: Parse the line into pieces
+            # Students: .split(',') turns "1,John,mail" into ["1", "John", "mail"]
+            data_parts = current_line.strip().split(",")
             
-            if len(parts) >= 3:
-                print("ID: " + parts[0] + " | Name: " + parts[1] + " | Email: " + parts[2])
-            line = f.readline()
-        f.close()
-        print("-------------------\n")
-        
-    elif choice == '3':
+            if len(data_parts) >= 3:
+                client_id = data_parts[0]
+                client_name = data_parts[1]
+                client_email = data_parts[2]
+                print(f"ID: {client_id} | Name: {client_name} | Email: {client_email}")
+            
+            current_line = db_view.readline()
+            
+        db_view.close()
+        print("-" * 30)
+
+    # --- 5. EXIT SECTION ---
+    elif user_choice == '3':
+        print("Goodbye!")
         break
+        
     else:
-        print("Invalid choice.")
+        print("Invalid choice. Please pick 1, 2, or 3.")
