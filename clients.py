@@ -4,82 +4,51 @@
 # This script manages client data in a text file.
 # Students: Notice how the code is grouped into logical sections.
 # Each section could eventually become a function!
+import os
 
 FILENAME = "clients.txt"
 
-# --- 1. INITIALIZATION ---
-# Check if the file exists, if not, create it with a header.
-try:
-    file_check = open(FILENAME, "r")
-    file_check.close()
-except FileNotFoundError:
-    print("Initializing database...")
-    database = open(FILENAME, "w")
-    database.write("id,name,email\n")
-    database.close()
+def setup_db():
+    if not os.path.exists(FILENAME):
+        with open(FILENAME, "w") as f:
+            f.write("id,name,email\n")
 
-# --- 2. MAIN MENU LOOP ---
-while True:
-    print("\n" + "="*25)
-    print("   CLIENT MANAGEMENT")
-    print("="*25)
-    print("1. Add a New Client")
-    print("2. View All Clients")
-    print("3. Exit Program")
-    print("-" * 25)
+def ajouter_client():
+    name = input("- Name: ")
+    email = input("- Email: ")
+    with open(FILENAME, "r") as f:
+        lignes = f.readlines()
+    new_id = len(lignes)
+    with open(FILENAME, "a") as f:
+        f.write(f"{new_id},{name},{email}\n")
+    print(f"client enregistred with the ID {new_id}")
+
+def afficher_liste():
+    print("\n--- CLIENTS LIST ---")
+    with open(FILENAME, "r") as f:
+        data = f.readlines()[1:] 
     
-    user_choice = input("What would you like to do? ")
 
-    # --- 3. ADD CLIENT SECTION ---
-    if user_choice == '1':
-        print("\nAdding a new client...")
-        name = input("- Name: ")
-        email = input("- Email: ")
-        
-        # Step: Calculate the next ID (number of lines in file)
-        db_read = open(FILENAME, "r")
-        all_lines = db_read.readlines()
-        db_read.close()
-        new_id = len(all_lines)
-        
-        # Step: Append the new client to the file
-        db_append = open(FILENAME, "a")
-        # Format: id,name,email
-        db_append.write(str(new_id) + "," + name + "," + email + "\n")
-        db_append.close()
-        
-        print(f"DONE! Client '{name}' saved with ID {new_id}.")
+    clients = [line.strip().split(",") for line in data]
+    
+    for c in clients:
+        if len(c) >= 3:
+            print(f"ID: {c[0]} | Name: {c[1]} | Email: {c[2]}")
 
-    # --- 4. LIST CLIENTS SECTION ---
-    elif user_choice == '2':
-        print("\n" + "-"*30)
-        print("      CURRENT CLIENT LIST")
-        print("-"*30)
-        
-        db_view = open(FILENAME, "r")
-        header = db_view.readline() # Skip the first line (header)
-        
-        current_line = db_view.readline()
-        while current_line:
-            # Step: Parse the line into pieces
-            # Students: .split(',') turns "1,John,mail" into ["1", "John", "mail"]
-            data_parts = current_line.strip().split(",")
-            
-            if len(data_parts) >= 3:
-                client_id = data_parts[0]
-                client_name = data_parts[1]
-                client_email = data_parts[2]
-                print(f"ID: {client_id} | Name: {client_name} | Email: {client_email}")
-            
-            current_line = db_view.readline()
-            
-        db_view.close()
-        print("-" * 30)
+def menu():
+    setup_db()
+    while True:
+        print("\n" + "="*25 + "\n1. Add a New clients\n2. View all clients\n3. Exit Program\n" + "="*25)
+        choix = input("Action : ")
+        if choix == "1":
+            ajouter_client()
+        elif choix == "2":
+            afficher_liste()
+        elif choix == "3":
+            print("Goodbye")
+            break
+        else:
+            print("Invalid Choice")
 
-    # --- 5. EXIT SECTION ---
-    elif user_choice == '3':
-        print("Goodbye!")
-        break
-        
-    else:
-        print("Invalid choice. Please pick 1, 2, or 3.")
+if __name__ == "__main__":
+    menu()  
