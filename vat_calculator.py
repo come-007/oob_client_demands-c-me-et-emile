@@ -1,41 +1,33 @@
 # ==========================================
-# VAT CALCULATOR - EDUCATIONAL VERSION
+# VAT CALCULATOR - OPTIMISEZ VERSION
 # ==========================================
-# A simple tool to calculate "Value Added Tax".
-# This uses basic arithmetic: (amount * rate) / 100
 
-print("\n" + "*"*25)
-print("   TAX CALCULATOR")
-print("*"*25)
+def calculate_vat(net_amount, vat_rate=20.0):
+    """
+    Calcule la TVA et le prix total.
+    net_amount : montant net
+    vat_rate : taux de TVA (par défaut 20%)
+    Retourne : (tax_to_pay, total_price)
+    """
+    tax_to_pay = net_amount * (vat_rate / 100)
+    total_price = net_amount + tax_to_pay
+    return tax_to_pay, total_price
+
 
 # --- 1. USER INPUT ---
 raw_amount = input("Enter the net amount (e.g. 100): ")
 raw_rate = input("Enter the VAT rate % (press Enter for 20%): ")
 
 # --- 2. LOGIC AND CALCULATION ---
-# We use a try/except block to catch people entering text instead of numbers!
 try:
-    # Step A: Convert inputs to decimal numbers (floats)
     net_value = float(raw_amount)
-    
-    # Step B: Default to 20.0 if the user just pressed Enter
-    if raw_rate == "":
-        tax_rate = 20.0
-    else:
-        tax_rate = float(raw_rate)
-    
-    # Step C: The Math
-    tax_to_pay = net_value * (tax_rate / 100.0)
-    total_price = net_value + tax_to_pay
-    
+    tax_rate = float(raw_rate) if raw_rate else 20.0
+
+    tax_to_pay, total_price = calculate_vat(net_value, tax_rate)
+
     # --- 3. DISPLAY RESULTS ---
+    print("\n" + "*"*25)
+    print("   TAX CALCULATOR")
+    print("*"*25)
     print("\nCALCULATION SUMMARY:")
     print(f"- Net Amount:   ${net_value:.2f}")
-    print(f"- VAT ({tax_rate}%): ${tax_to_pay:.2f}")
-    print("-" * 25)
-    print(f"- TOTAL PRICE:  ${total_price:.2f}")
-    print("*" * 25 + "\n")
-
-except ValueError:
-    # This runs if float() failed!
-    print("\n[!] ERROR: Please enter digits only (e.g. 12.50).")
